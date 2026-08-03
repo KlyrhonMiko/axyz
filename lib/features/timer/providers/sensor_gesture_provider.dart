@@ -10,6 +10,7 @@ import '../../settings/providers/settings_provider.dart';
 class SensorGestureNotifier extends StateNotifier<SensorGestureState> {
   final Ref _ref;
   StreamSubscription<AccelerometerEvent>? _accelSub;
+  StreamSubscription<UserAccelerometerEvent>? _userAccelSub;
 
   Timer? _debounceTimer;
   DateTime? _lastTapTime;
@@ -24,6 +25,7 @@ class SensorGestureNotifier extends StateNotifier<SensorGestureState> {
 
   void _disposeSubscriptions() {
     _accelSub?.cancel();
+    _userAccelSub?.cancel();
     _debounceTimer?.cancel();
   }
 
@@ -33,8 +35,46 @@ class SensorGestureNotifier extends StateNotifier<SensorGestureState> {
         _onAccelerometerEvent,
         onError: (err) => debugPrint('Accelerometer stream error: $err'),
       );
+      
+      // Use higher sampling rate user accelerometer for tap detection
+      _userAccelSub = userAccelerometerEventStream(samplingPeriod: const Duration(milliseconds: 20)).listen(
+        _onUserAccelerometerEvent,
+        onError: (err) => debugPrint('User Accelerometer stream error: $err'),
+      );
     } catch (e) {
-      debugPrint('Failed to initialize accelerometer stream: $e');
+      debugPrint('Failed to initialize sensors: $e');
+    }
+  }
+
+  void _onUserAccelerometerEvent(UserAccelerometerEvent event) {
+    final settings = _ref.read(settingsProvider);
+    if (!settings.backTapEnabled) return;
+
+    // A tap on the back creates a sharp spike primarily on the Z-axis.
+    final zSpike = event.z.abs();
+    final xSpike = event.x.abs();
+    final ySpike = event.y.abs();
+    
+    // 1. Keep threshold low (8.0) so natural taps are easy.
+    // 2. STRICT purity check: Z must be at least 1.5x larger than X and Y.
+    //    A couch drop creates uneven tumbling, so X and Y will be relatively high.
+    //    A finger tap is highly focused on the Z axis.
+    if (zSpike > 8.0 && zSpike > (xSpike * 1.5) && zSpike > (ySpike * 1.5)) { 
+      final now = DateTime.now();
+      if (_lastTapTime != null) {
+        final diffMs = now.difference(_lastTapTime!).inMilliseconds;
+        // 3. Tighten max gap to 400ms. A bounce on a couch is often a slow, 
+        //    lofty airborne bounce. A double tap is typically fast (100-300ms).
+        if (diffMs >= 100 && diffMs <= 400) {
+          _triggerBackTap();
+          _lastTapTime = null;
+        } else {
+          // Ringing / bouncing filter
+          _lastTapTime = now;
+        }
+      } else {
+        _lastTapTime = now;
+      }
     }
   }
 
@@ -49,26 +89,6 @@ class SensorGestureNotifier extends StateNotifier<SensorGestureState> {
     final calX = rawX - settings.deadzoneX;
     final calY = rawY - settings.deadzoneY;
     final calZ = rawZ - settings.deadzoneZ;
-
-    // 1. Back Tap Detection (Sharp Z-axis spike)
-    if (settings.backTapEnabled) {
-      final deltaZ = (calZ - _prevZ).abs();
-      if (deltaZ > 13.5) {
-        final now = DateTime.now();
-        if (_lastTapTime != null) {
-          final diffMs = now.difference(_lastTapTime!).inMilliseconds;
-          if (diffMs >= 100 && diffMs <= 500) {
-            _triggerBackTap();
-            _lastTapTime = null;
-          } else {
-            _lastTapTime = now;
-          }
-        } else {
-          _lastTapTime = now;
-        }
-      }
-    }
-    _prevZ = calZ;
 
     // 2. Determine Orientation from calibrated vectors
     final detectedOrientation = _calculateOrientation(calX, calY, calZ);

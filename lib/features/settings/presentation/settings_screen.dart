@@ -389,25 +389,28 @@ class _SwitchTile extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
+      child: Material(
         color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-      ),
-      child: SwitchListTile(
-        title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: 11,
-            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
           ),
         ),
-        value: value,
-        activeTrackColor: AppColors.accentDeepWork,
-        onChanged: onChanged,
+        clipBehavior: Clip.antiAlias,
+        child: SwitchListTile(
+          title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          subtitle: Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 11,
+              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+            ),
+          ),
+          value: value,
+          activeTrackColor: AppColors.accentDeepWork,
+          onChanged: onChanged,
+        ),
       ),
     );
   }
