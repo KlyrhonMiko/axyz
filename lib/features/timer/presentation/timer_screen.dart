@@ -50,100 +50,105 @@ class TimerScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background Indicators (Edge Dots & Center Glow)
-          if (timerState.status == TimerStatus.idle) ...[
-            EdgeDotIndicator(
-              alignment: Alignment.topCenter,
-              color: TimerMode.pomodoro.color,
-              isActive: sensorState.pendingOrientation == DeviceOrientationMode.portraitUp && sensorState.isDebouncing,
-            ),
-            EdgeDotIndicator(
-              alignment: Alignment.bottomCenter,
-              color: TimerMode.shortBreak.color,
-              isActive: sensorState.pendingOrientation == DeviceOrientationMode.portraitDown && sensorState.isDebouncing,
-            ),
-            EdgeDotIndicator(
-              alignment: Alignment.centerLeft,
-              color: TimerMode.longBreak.color,
-              isActive: sensorState.pendingOrientation == DeviceOrientationMode.landscapeLeft && sensorState.isDebouncing,
-            ),
-            EdgeDotIndicator(
-              alignment: Alignment.centerRight,
-              color: TimerMode.customFocus.color,
-              isActive: sensorState.pendingOrientation == DeviceOrientationMode.landscapeRight && sensorState.isDebouncing,
-            ),
-            CenterGlowIndicator(
-              isActive: sensorState.pendingOrientation == DeviceOrientationMode.faceDown && sensorState.isDebouncing,
-              color: TimerMode.deepWork.color,
-            ),
-          ],
-
-          // Central Timer & Sector Tracking Ring
-          SafeArea(
-            child: Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  ProgressRing(
-                    progress: timerState.progress,
-                    accentColor: activeColor,
-                    size: 270.0,
-                    child: TimerDisplay(timerState: timerState),
-                  ),
-                  AnimatedSectorRing(
-                    isActive: timerState.status == TimerStatus.idle,
-                    calX: sensorState.calX,
-                    calY: sensorState.calY,
-                    isDebouncing: sensorState.isDebouncing,
-                    targetAngle: getAngleForOrientation(sensorState.pendingOrientation),
-                    debounceMs: settings.debounceMs,
-                    color: upcomingColor,
-                    size: 270.0,
-                  ),
-                ],
+      body: Listener(
+        onPointerDown: (_) => ref.read(timerProvider.notifier).registerInteraction(),
+        onPointerMove: (_) => ref.read(timerProvider.notifier).registerInteraction(),
+        behavior: HitTestBehavior.translucent,
+        child: Stack(
+          children: [
+            // Background Indicators (Edge Dots & Center Glow)
+            if (timerState.status == TimerStatus.idle) ...[
+              EdgeDotIndicator(
+                alignment: Alignment.topCenter,
+                color: TimerMode.pomodoro.color,
+                isActive: sensorState.pendingOrientation == DeviceOrientationMode.portraitUp && sensorState.isDebouncing,
               ),
-            ),
-          ),
-
-          // Settings Button (Fixed Top Right)
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SettingsScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(LucideIcons.settings2, size: 20),
-                  tooltip: 'Settings & Calibration',
-                  color: activeColor.withValues(alpha: 0.6),
-                ),
-              ),
-            ),
-          ),
-
-          // Cancel Control (Fixed Bottom Center)
-          if (timerState.status != TimerStatus.idle)
-            const SafeArea(
-              child: Align(
+              EdgeDotIndicator(
                 alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 32.0),
-                  child: CancelControlSection(),
+                color: TimerMode.shortBreak.color,
+                isActive: sensorState.pendingOrientation == DeviceOrientationMode.portraitDown && sensorState.isDebouncing,
+              ),
+              EdgeDotIndicator(
+                alignment: Alignment.centerLeft,
+                color: TimerMode.longBreak.color,
+                isActive: sensorState.pendingOrientation == DeviceOrientationMode.landscapeLeft && sensorState.isDebouncing,
+              ),
+              EdgeDotIndicator(
+                alignment: Alignment.centerRight,
+                color: TimerMode.customFocus.color,
+                isActive: sensorState.pendingOrientation == DeviceOrientationMode.landscapeRight && sensorState.isDebouncing,
+              ),
+              CenterGlowIndicator(
+                isActive: sensorState.pendingOrientation == DeviceOrientationMode.faceDown && sensorState.isDebouncing,
+                color: TimerMode.deepWork.color,
+              ),
+            ],
+
+            // Central Timer & Sector Tracking Ring
+            SafeArea(
+              child: Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    ProgressRing(
+                      progress: timerState.progress,
+                      accentColor: activeColor,
+                      size: 270.0,
+                      child: TimerDisplay(timerState: timerState),
+                    ),
+                    AnimatedSectorRing(
+                      isActive: timerState.status == TimerStatus.idle,
+                      calX: sensorState.calX,
+                      calY: sensorState.calY,
+                      isDebouncing: sensorState.isDebouncing,
+                      targetAngle: getAngleForOrientation(sensorState.pendingOrientation),
+                      debounceMs: settings.debounceMs,
+                      color: upcomingColor,
+                      size: 270.0,
+                    ),
+                  ],
                 ),
               ),
             ),
 
-          // AOD Pitch Black Overlay (Layered on top when active)
-          const AodOverlay(),
-        ],
+            // Settings Button (Fixed Top Right)
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(LucideIcons.settings2, size: 20),
+                    tooltip: 'Settings & Calibration',
+                    color: activeColor.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+            ),
+
+            // Cancel Control (Fixed Bottom Center)
+            if (timerState.status != TimerStatus.idle)
+              const SafeArea(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 32.0),
+                    child: CancelControlSection(),
+                  ),
+                ),
+              ),
+
+            // AOD Pitch Black Overlay (Layered on top when active)
+            const AodOverlay(),
+          ],
+        ),
       ),
     );
   }

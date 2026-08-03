@@ -24,8 +24,30 @@ class TimerNotifier extends StateNotifier<TimerState> {
     _listenToSensorGestures();
   }
 
+  Timer? _inactivityTimer;
+
+  void registerInteraction() {
+    final isFaceDown = _ref.read(sensorGestureProvider).currentOrientation == DeviceOrientationMode.faceDown;
+    final isDeepWork = state.activeMode == TimerMode.deepWork;
+
+    // Wake up if AOD was triggered by inactivity
+    if (state.isAodActive && !isFaceDown && !isDeepWork) {
+      state = state.copyWith(isAodActive: false);
+    }
+
+    _inactivityTimer?.cancel();
+    if (state.status == TimerStatus.running && !isFaceDown && !isDeepWork) {
+      _inactivityTimer = Timer(const Duration(seconds: 15), () {
+        if (state.status == TimerStatus.running && !state.isAodActive) {
+          state = state.copyWith(isAodActive: true);
+        }
+      });
+    }
+  }
+
   @override
   void dispose() {
+    _inactivityTimer?.cancel();
     _countdownTimer?.cancel();
     super.dispose();
   }
@@ -83,6 +105,8 @@ class TimerNotifier extends StateNotifier<TimerState> {
       remainingSeconds: totalSecs,
       isAodActive: isAod,
     );
+    
+    registerInteraction(); // Start the inactivity timer when the timer begins
 
     // Audio & Haptic Feedback: Start Crisp Thud + Chime
     if (settings.hapticsEnabled) {
@@ -109,6 +133,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   void pauseTimer() {
     if (state.status == TimerStatus.running) {
       _countdownTimer?.cancel();
+      _inactivityTimer?.cancel();
       state = state.copyWith(status: TimerStatus.paused);
     }
   }
@@ -117,6 +142,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   void resumeTimer() {
     if (state.status == TimerStatus.paused) {
       state = state.copyWith(status: TimerStatus.running);
+      registerInteraction(); // Restart inactivity timer
       _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (state.remainingSeconds > 1) {
           state = state.copyWith(remainingSeconds: state.remainingSeconds - 1);
@@ -130,6 +156,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   /// Cancel current timer with feedback
   void cancelTimer({required String reason}) {
     _countdownTimer?.cancel();
+    _inactivityTimer?.cancel();
     final settings = _ref.read(settingsProvider);
 
     state = state.copyWith(
@@ -154,6 +181,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
 
   void _onTimerCompleted() {
     _countdownTimer?.cancel();
+    _inactivityTimer?.cancel();
     final settings = _ref.read(settingsProvider);
 
     state = state.copyWith(
@@ -176,6 +204,7 @@ class TimerNotifier extends StateNotifier<TimerState> {
   /// Reset completed timer to idle
   void resetToIdle() {
     _countdownTimer?.cancel();
+    _inactivityTimer?.cancel();
     state = const TimerState();
   }
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'core/theme/app_theme.dart';
 import 'features/timer/presentation/timer_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  WakelockPlus.enable();
 
   // Set system UI overlay style for seamless edge-to-edge transparent navigation
   SystemChrome.setSystemUIOverlayStyle(
