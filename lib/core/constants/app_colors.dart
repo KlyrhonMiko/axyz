@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Dark Theme Palette (Default)
-  static const Color darkBackground = Color(0xFF0D0F12);
-  static const Color darkSurface = Color(0xFF16191E);
-  static const Color darkCard = Color(0xFF1E222A);
-  static const Color darkBorder = Color(0xFF2B303C);
+  static const Color darkBackground = Color(0xFF101010);
+  static const Color darkSurface = Color(0xFF181818);
+  static const Color darkCard = Color(0xFF202020);
+  static const Color darkBorder = Color(0xFF2E2E2E);
 
   // Light Theme Palette
   static const Color lightBackground = Color(0xFFF7F8FA);
@@ -27,12 +27,12 @@ class AppColors {
   static const Color lightTextSecondary = Color(0xFF636E7B);
   static const Color lightTextMuted = Color(0xFFA0A7B5);
 
-  // Subtle Desaturated Accents
-  static const Color accentDeepWork = Color(0xFF7A88BF); // Muted slate blue
-  static const Color accentPomodoro = Color(0xFFCF6A6A); // Subtle desaturated crimson
-  static const Color accentShortBreak = Color(0xFF5BA793); // Muted sage/teal
-  static const Color accentLongBreak = Color(0xFF9E7CC1); // Muted violet
-  static const Color accentFocus = Color(0xFFD4A359); // Muted amber
+  // Minimalist Green Accents
+  static const Color accentDeepWork = Color(0xFF76C893); // Mint green
+  static const Color accentPomodoro = Color(0xFF99D98C); // Yellow-green
+  static const Color accentShortBreak = Color(0xFF52B69A); // Teal-green
+  static const Color accentLongBreak = Color(0xFFB5E48C); // Light green
+  static const Color accentFocus = Color(0xFF34A0A4); // Deep green
 
   static const Color cancelRed = Color(0xFFE54D42);
   static const Color successTeal = Color(0xFF38B2AC);
