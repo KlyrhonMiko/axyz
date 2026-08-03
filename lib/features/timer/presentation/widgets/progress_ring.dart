@@ -57,11 +57,11 @@ class _RingPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - 12) / 2;
-    const strokeWidth = 3.5;
+    const strokeWidth = 1.0;
 
     // Draw background track
     final trackPaint = Paint()
-      ..color = trackColor
+      ..color = trackColor.withValues(alpha: 0.05)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 
@@ -73,7 +73,7 @@ class _RingPainter extends CustomPainter {
         ..color = accentColor
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
-        ..strokeWidth = strokeWidth + 1.0;
+        ..strokeWidth = strokeWidth;
 
       final startAngle = -pi / 2;
       final sweepAngle = 2 * pi * progress;

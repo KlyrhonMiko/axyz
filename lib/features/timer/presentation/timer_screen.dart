@@ -5,7 +5,6 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../providers/timer_provider.dart';
 import 'widgets/aod_overlay.dart';
 import 'widgets/cancel_button.dart';
-import 'widgets/orientation_guide.dart';
 import 'widgets/progress_ring.dart';
 import 'widgets/timer_display.dart';
 import '../../settings/presentation/settings_screen.dart';
@@ -31,42 +30,10 @@ class TimerScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Column(
                 children: [
-                  // Sleek Top Header
+                  // Minimal Top Header
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: activeColor.withValues(alpha: 0.15),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: activeColor.withValues(alpha: 0.4)),
-                            ),
-                            child: Center(
-                              child: Text(
-                                'X',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: activeColor,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'AXYZ',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 3.5,
-                            ),
-                          ),
-                        ],
-                      ),
                       IconButton(
                         onPressed: () {
                           Navigator.of(context).push(
@@ -77,6 +44,7 @@ class TimerScreen extends ConsumerWidget {
                         },
                         icon: const Icon(LucideIcons.settings2, size: 20),
                         tooltip: 'Settings & Calibration',
+                        color: activeColor.withValues(alpha: 0.6),
                       ),
                     ],
                   ),
@@ -96,12 +64,6 @@ class TimerScreen extends ConsumerWidget {
                   // Cancel Control Section (Visible when timer is locked/running)
                   const CancelControlSection(),
 
-                  const SizedBox(height: 16),
-
-                  // Orientation Hardware Triggers Visualizer
-                  const OrientationGuide(),
-
-                  const SizedBox(height: 12),
                 ],
               ),
             ),

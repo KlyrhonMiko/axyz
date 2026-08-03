@@ -22,28 +22,17 @@ class TimerDisplay extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Mode badge/label
+        // Minimalist mode badge
         AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
           opacity: timerState.status == TimerStatus.idle ? 0.6 : 1.0,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: modeColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: modeColor.withValues(alpha: 0.3),
-                width: 1,
-              ),
-            ),
-            child: Text(
-              mode?.title.toUpperCase() ?? 'READY',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 2.5,
-                color: modeColor,
-              ),
+          child: Text(
+            mode?.title.toUpperCase() ?? 'READY',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 4.0,
+              color: modeColor,
             ),
           ),
         ),
@@ -65,12 +54,16 @@ class TimerDisplay extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Subtitle status
-        Text(
-          _getStatusSubtitle(),
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: timerState.status == TimerStatus.running ? 0.0 : 1.0,
+          child: Text(
+            _getStatusSubtitle(),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+              color: (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary).withValues(alpha: 0.7),
+            ),
           ),
         ),
       ],

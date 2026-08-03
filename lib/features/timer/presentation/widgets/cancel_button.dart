@@ -29,27 +29,13 @@ class CancelControlSection extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Minimalist Cancel Button
-            OutlinedButton.icon(
+            IconButton(
               onPressed: () {
                 ref.read(timerProvider.notifier).cancelTimer(reason: 'ui');
               },
-              icon: const Icon(LucideIcons.x, size: 16, color: AppColors.cancelRed),
-              label: const Text(
-                'CANCEL SESSION',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.5,
-                  color: AppColors.cancelRed,
-                ),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.cancelRed.withValues(alpha: 0.4)),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
+              icon: const Icon(LucideIcons.x, size: 28),
+              color: AppColors.cancelRed.withValues(alpha: 0.7),
+              tooltip: 'Cancel Session',
             ),
           ],
         ),
