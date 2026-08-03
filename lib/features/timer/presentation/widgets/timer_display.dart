@@ -88,7 +88,7 @@ class TimerDisplay extends StatelessWidget {
       case TimerStatus.paused:
         return 'Session paused';
       case TimerStatus.completed:
-        return 'Focus session completed 🎉';
+        return 'Focus session completed';
     }
   }
 }

@@ -27,13 +27,20 @@ class ProgressRing extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          CustomPaint(
-            size: Size(size, size),
-            painter: _RingPainter(
-              progress: progress,
-              accentColor: accentColor,
-              trackColor: trackColor,
-            ),
+          TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: progress, end: progress),
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.linear,
+            builder: (context, animatedProgress, child) {
+              return CustomPaint(
+                size: Size(size, size),
+                painter: _RingPainter(
+                  progress: animatedProgress,
+                  accentColor: accentColor,
+                  trackColor: trackColor,
+                ),
+              );
+            },
           ),
           Center(child: child),
         ],
