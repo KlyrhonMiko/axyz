@@ -8,7 +8,7 @@ A sophisticated, modern, and interactive Pomodoro timer built with Flutter.
 
 ## Overview
 
-AXYZ is designed to offer a premium and effortless experience for managing your focus sessions. Utilizing device sensors for motion-based controls and an intuitive interface, AXYZ helps you maximize your productivity. The sleek, deep dark mode design ensures minimal distraction while you work.
+axyz is designed to offer a premium and effortless experience for managing your focus sessions. Utilizing device sensors for motion-based controls and an intuitive interface, AXYZ helps you maximize your productivity. The sleek, deep dark mode design ensures minimal distraction while you work.
 
 ## Key Features
 
