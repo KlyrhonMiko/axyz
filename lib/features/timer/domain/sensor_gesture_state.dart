@@ -9,8 +9,6 @@ class SensorGestureState {
   final double calX;
   final double calY;
   final double calZ;
-  final bool isNear;
-  final double smotherProgress; // 0.0 to 1.0 (2 seconds)
   final bool backTapDetected;
   final bool isDebouncing;
 
@@ -23,8 +21,6 @@ class SensorGestureState {
     this.calX = 0.0,
     this.calY = 0.0,
     this.calZ = 9.8,
-    this.isNear = false,
-    this.smotherProgress = 0.0,
     this.backTapDetected = false,
     this.isDebouncing = false,
   });
@@ -38,8 +34,6 @@ class SensorGestureState {
     double? calX,
     double? calY,
     double? calZ,
-    bool? isNear,
-    double? smotherProgress,
     bool? backTapDetected,
     bool? isDebouncing,
   }) {
@@ -52,8 +46,6 @@ class SensorGestureState {
       calX: calX ?? this.calX,
       calY: calY ?? this.calY,
       calZ: calZ ?? this.calZ,
-      isNear: isNear ?? this.isNear,
-      smotherProgress: smotherProgress ?? this.smotherProgress,
       backTapDetected: backTapDetected ?? this.backTapDetected,
       isDebouncing: isDebouncing ?? this.isDebouncing,
     );

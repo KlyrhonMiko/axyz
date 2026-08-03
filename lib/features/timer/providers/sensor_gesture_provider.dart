@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:proximity_sensor/proximity_sensor.dart';
 
 import '../domain/device_orientation_mode.dart';
 import '../domain/sensor_gesture_state.dart';
@@ -11,10 +10,8 @@ import '../../settings/providers/settings_provider.dart';
 class SensorGestureNotifier extends StateNotifier<SensorGestureState> {
   final Ref _ref;
   StreamSubscription<AccelerometerEvent>? _accelSub;
-  StreamSubscription<dynamic>? _proximitySub;
 
   Timer? _debounceTimer;
-  Timer? _smotherTimer;
   DateTime? _lastTapTime;
   double _prevZ = 9.8;
 
@@ -27,9 +24,7 @@ class SensorGestureNotifier extends StateNotifier<SensorGestureState> {
 
   void _disposeSubscriptions() {
     _accelSub?.cancel();
-    _proximitySub?.cancel();
     _debounceTimer?.cancel();
-    _smotherTimer?.cancel();
   }
 
   void _initSensors() {
@@ -40,15 +35,6 @@ class SensorGestureNotifier extends StateNotifier<SensorGestureState> {
       );
     } catch (e) {
       debugPrint('Failed to initialize accelerometer stream: $e');
-    }
-
-    try {
-      _proximitySub = ProximitySensor.events.listen(
-        _onProximityEvent,
-        onError: (err) => debugPrint('Proximity stream error: $err'),
-      );
-    } catch (e) {
-      debugPrint('Failed to initialize proximity stream: $e');
     }
   }
 
@@ -140,56 +126,12 @@ class SensorGestureNotifier extends StateNotifier<SensorGestureState> {
     return state.currentOrientation; // Retain prior state if neutral transition
   }
 
-  void _onProximityEvent(dynamic event) {
-    final settings = _ref.read(settingsProvider);
-    if (!settings.smotherEnabled) return;
-
-    // Proximity value: 0 is near, >0 is far
-    final bool isNear = (event is int) ? (event == 0) : false;
-
-    if (isNear != state.isNear) {
-      state = state.copyWith(isNear: isNear);
-
-      if (isNear) {
-        _startSmotherTimer();
-      } else {
-        _cancelSmotherTimer();
-      }
-    }
-  }
-
-  void _startSmotherTimer() {
-    _smotherTimer?.cancel();
-    const totalTicks = 20; // 2 seconds total, updated every 100ms
-    int currentTick = 0;
-
-    _smotherTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      currentTick++;
-      final progress = (currentTick / totalTicks).clamp(0.0, 1.0);
-      state = state.copyWith(smotherProgress: progress);
-
-      if (currentTick >= totalTicks) {
-        timer.cancel();
-        _triggerSmother();
-      }
-    });
-  }
-
-  void _cancelSmotherTimer() {
-    _smotherTimer?.cancel();
-    state = state.copyWith(smotherProgress: 0.0);
-  }
-
   // Action callbacks triggered by gestures
   void _triggerBackTap() {
     state = state.copyWith(backTapDetected: true);
     Future.delayed(const Duration(milliseconds: 600), () {
       if (mounted) state = state.copyWith(backTapDetected: false);
     });
-  }
-
-  void _triggerSmother() {
-    state = state.copyWith(smotherProgress: 1.0);
   }
 
   /// Simulated tilt for testing and desktop/emulator support

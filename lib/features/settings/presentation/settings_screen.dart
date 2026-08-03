@@ -148,12 +148,6 @@ class SettingsScreen extends ConsumerWidget {
             value: settings.backTapEnabled,
             onChanged: (val) => ref.read(settingsProvider.notifier).toggleBackTap(val),
           ),
-          _SwitchTile(
-            title: 'Hand Smother Cancel',
-            subtitle: 'Cover top proximity sensor for 2 seconds',
-            value: settings.smotherEnabled,
-            onChanged: (val) => ref.read(settingsProvider.notifier).toggleSmother(val),
-          ),
 
           const SizedBox(height: 16),
           // Debounce Slider

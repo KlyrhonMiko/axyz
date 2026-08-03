@@ -33,9 +33,6 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     state = state.copyWith(backTapEnabled: value);
   }
 
-  void toggleSmother(bool value) {
-    state = state.copyWith(smotherEnabled: value);
-  }
 
   void setDebounceMs(int value) {
     state = state.copyWith(debounceMs: value);

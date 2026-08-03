@@ -7,7 +7,6 @@ class SettingsState {
   final bool soundEnabled;
   final bool hapticsEnabled;
   final bool backTapEnabled;
-  final bool smotherEnabled;
   final int debounceMs;
   final Map<TimerMode, int> modeDurations;
 
@@ -18,7 +17,6 @@ class SettingsState {
     this.soundEnabled = true,
     this.hapticsEnabled = true,
     this.backTapEnabled = true,
-    this.smotherEnabled = true,
     this.debounceMs = 400,
     this.modeDurations = const {
       TimerMode.deepWork: 60,
@@ -36,7 +34,6 @@ class SettingsState {
     bool? soundEnabled,
     bool? hapticsEnabled,
     bool? backTapEnabled,
-    bool? smotherEnabled,
     int? debounceMs,
     Map<TimerMode, int>? modeDurations,
   }) {
@@ -47,7 +44,6 @@ class SettingsState {
       soundEnabled: soundEnabled ?? this.soundEnabled,
       hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
       backTapEnabled: backTapEnabled ?? this.backTapEnabled,
-      smotherEnabled: smotherEnabled ?? this.smotherEnabled,
       debounceMs: debounceMs ?? this.debounceMs,
       modeDurations: modeDurations ?? this.modeDurations,
     );

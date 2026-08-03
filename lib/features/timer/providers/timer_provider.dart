@@ -44,12 +44,6 @@ class TimerNotifier extends StateNotifier<TimerState> {
           return;
         }
 
-        // 2. Proximity Smother Cancellation (held 2 seconds)
-        if (next.smotherProgress >= 1.0 && settings.smotherEnabled) {
-          cancelTimer(reason: 'smother');
-          return;
-        }
-
         // 3. AOD Dynamic Toggle based on physical posture (Face Down = Pitch Black AOD)
         final isFaceDown = (next.currentOrientation == DeviceOrientationMode.faceDown);
         if (isFaceDown != state.isAodActive) {
