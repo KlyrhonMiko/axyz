@@ -6,10 +6,7 @@ import '../../../../core/constants/app_colors.dart';
 class TimerDisplay extends StatelessWidget {
   final TimerState timerState;
 
-  const TimerDisplay({
-    super.key,
-    required this.timerState,
-  });
+  const TimerDisplay({super.key, required this.timerState});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +14,9 @@ class TimerDisplay extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final TimerMode? mode = timerState.activeMode;
-    final Color modeColor = mode?.color ?? (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary);
+    final Color modeColor =
+        mode?.color ??
+        (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -41,7 +40,9 @@ class TimerDisplay extends StatelessWidget {
         // Central Minimalist Numeric Timer
         Text(
           timerState.status == TimerStatus.idle
-              ? '--:--'
+              ? (mode != null
+                    ? '${mode.defaultDurationMinutes.toString().padLeft(2, '0')}:00'
+                    : '00:00')
               : timerState.formattedTime,
           style: theme.textTheme.displayLarge?.copyWith(
             fontSize: 76,
@@ -57,12 +58,20 @@ class TimerDisplay extends StatelessWidget {
         AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
           opacity: timerState.status == TimerStatus.running ? 0.0 : 1.0,
-          child: Text(
-            _getStatusSubtitle(),
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-              color: (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary).withValues(alpha: 0.7),
+          child: SizedBox(
+            width: 180, // Constrain width so it wraps nicely inside the ring
+            child: Text(
+              _getStatusSubtitle(),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color:
+                    (isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary)
+                        .withValues(alpha: 0.7),
+              ),
             ),
           ),
         ),
