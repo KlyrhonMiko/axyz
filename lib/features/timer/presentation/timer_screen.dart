@@ -23,15 +23,19 @@ class TimerScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final timerState = ref.watch(timerProvider);
-    final sensorState = ref.watch(sensorGestureProvider);
+    final timerStatus = ref.watch(timerProvider.select((s) => s.status));
+    final activeMode = ref.watch(timerProvider.select((s) => s.activeMode));
+    
+    final pendingOrientation = ref.watch(sensorGestureProvider.select((s) => s.pendingOrientation));
+    final isDebouncing = ref.watch(sensorGestureProvider.select((s) => s.isDebouncing));
+    
     final settings = ref.watch(settingsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final activeColor = timerState.activeMode?.color ??
+    final activeColor = activeMode?.color ??
         (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary);
 
-    final pendingMode = TimerMode.fromOrientation(sensorState.pendingOrientation);
+    final pendingMode = TimerMode.fromOrientation(pendingOrientation);
     final upcomingColor = pendingMode?.color ?? activeColor;
 
     double getAngleForOrientation(DeviceOrientationMode? mode) {
@@ -56,30 +60,29 @@ class TimerScreen extends ConsumerWidget {
         behavior: HitTestBehavior.translucent,
         child: Stack(
           children: [
-            // Background Indicators (Edge Dots & Center Glow)
-            if (timerState.status == TimerStatus.idle) ...[
+            if (timerStatus == TimerStatus.idle) ...[
               EdgeDotIndicator(
                 alignment: Alignment.topCenter,
                 color: TimerMode.pomodoro.color,
-                isActive: sensorState.pendingOrientation == DeviceOrientationMode.portraitUp && sensorState.isDebouncing,
+                isActive: pendingOrientation == DeviceOrientationMode.portraitUp && isDebouncing,
               ),
               EdgeDotIndicator(
                 alignment: Alignment.bottomCenter,
                 color: TimerMode.shortBreak.color,
-                isActive: sensorState.pendingOrientation == DeviceOrientationMode.portraitDown && sensorState.isDebouncing,
+                isActive: pendingOrientation == DeviceOrientationMode.portraitDown && isDebouncing,
               ),
               EdgeDotIndicator(
                 alignment: Alignment.centerLeft,
                 color: TimerMode.longBreak.color,
-                isActive: sensorState.pendingOrientation == DeviceOrientationMode.landscapeLeft && sensorState.isDebouncing,
+                isActive: pendingOrientation == DeviceOrientationMode.landscapeLeft && isDebouncing,
               ),
               EdgeDotIndicator(
                 alignment: Alignment.centerRight,
                 color: TimerMode.customFocus.color,
-                isActive: sensorState.pendingOrientation == DeviceOrientationMode.landscapeRight && sensorState.isDebouncing,
+                isActive: pendingOrientation == DeviceOrientationMode.landscapeRight && isDebouncing,
               ),
               CenterGlowIndicator(
-                isActive: sensorState.pendingOrientation == DeviceOrientationMode.faceDown && sensorState.isDebouncing,
+                isActive: pendingOrientation == DeviceOrientationMode.faceDown && isDebouncing,
                 color: TimerMode.deepWork.color,
               ),
             ],
@@ -90,21 +93,33 @@ class TimerScreen extends ConsumerWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    ProgressRing(
-                      progress: timerState.progress,
-                      accentColor: activeColor,
-                      size: 270.0,
-                      child: TimerDisplay(timerState: timerState),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final progress = ref.watch(timerProvider.select((s) => s.progress));
+                        final timerState = ref.watch(timerProvider);
+                        return ProgressRing(
+                          progress: progress,
+                          accentColor: activeColor,
+                          size: 270.0,
+                          child: TimerDisplay(timerState: timerState),
+                        );
+                      }
                     ),
-                    AnimatedSectorRing(
-                      isActive: timerState.status == TimerStatus.idle,
-                      calX: sensorState.calX,
-                      calY: sensorState.calY,
-                      isDebouncing: sensorState.isDebouncing,
-                      targetAngle: getAngleForOrientation(sensorState.pendingOrientation),
-                      debounceMs: settings.debounceMs,
-                      color: upcomingColor,
-                      size: 270.0,
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final calX = ref.watch(sensorGestureProvider.select((s) => s.calX));
+                        final calY = ref.watch(sensorGestureProvider.select((s) => s.calY));
+                        return AnimatedSectorRing(
+                          isActive: timerStatus == TimerStatus.idle,
+                          calX: calX,
+                          calY: calY,
+                          isDebouncing: isDebouncing,
+                          targetAngle: getAngleForOrientation(pendingOrientation),
+                          debounceMs: settings.debounceMs,
+                          color: upcomingColor,
+                          size: 270.0,
+                        );
+                      }
                     ),
                   ],
                 ),
@@ -134,7 +149,7 @@ class TimerScreen extends ConsumerWidget {
             ),
 
             // Cancel Control (Fixed Bottom Center)
-            if (timerState.status != TimerStatus.idle)
+            if (timerStatus != TimerStatus.idle)
               const SafeArea(
                 child: Align(
                   alignment: Alignment.bottomCenter,

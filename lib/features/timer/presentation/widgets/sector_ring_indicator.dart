@@ -94,7 +94,7 @@ class _AnimatedSectorRingState extends State<AnimatedSectorRing>
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 350),
       curve: Curves.easeOutCubic,
-      tween: Tween<double>(begin: _continuousAngle, end: _continuousAngle),
+      tween: Tween<double>(begin: 0.0, end: _continuousAngle),
       builder: (context, animAngle, _) {
         return TweenAnimationBuilder<double>(
           duration: const Duration(milliseconds: 400),

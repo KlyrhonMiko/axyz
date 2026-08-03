@@ -93,6 +93,16 @@ class SensorGestureNotifier extends StateNotifier<SensorGestureState> {
     // 2. Determine Orientation from calibrated vectors
     final detectedOrientation = _calculateOrientation(calX, calY, calZ);
 
+    // Apply a noise filter: only update if change is significant or orientation changed
+    // This prevents flooding the UI with rebuilds from microscopic sensor jitter when idle
+    final diffX = (calX - state.calX).abs();
+    final diffY = (calY - state.calY).abs();
+    final diffZ = (calZ - state.calZ).abs();
+    
+    if (diffX < 0.1 && diffY < 0.1 && diffZ < 0.1 && detectedOrientation == state.pendingOrientation) {
+      return;
+    }
+
     state = state.copyWith(
       rawX: rawX,
       rawY: rawY,
