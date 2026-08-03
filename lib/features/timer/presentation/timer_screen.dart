@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -23,6 +24,14 @@ class TimerScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(timerProvider.select((s) => s.isAodActive), (previous, isAodActive) {
+      if (isAodActive) {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      } else {
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      }
+    });
+
     final timerStatus = ref.watch(timerProvider.select((s) => s.status));
     final activeMode = ref.watch(timerProvider.select((s) => s.activeMode));
     

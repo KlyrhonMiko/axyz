@@ -67,9 +67,13 @@ class TimerNotifier extends StateNotifier<TimerState> {
         }
 
         // 3. AOD Dynamic Toggle based on physical posture (Face Down = Pitch Black AOD)
-        final isFaceDown = (next.currentOrientation == DeviceOrientationMode.faceDown);
-        if (isFaceDown != state.isAodActive) {
-          state = state.copyWith(isAodActive: isFaceDown);
+        if (previous?.currentOrientation != next.currentOrientation) {
+          final isFaceDown = (next.currentOrientation == DeviceOrientationMode.faceDown);
+          if (isFaceDown) {
+            state = state.copyWith(isAodActive: true);
+          } else {
+            registerInteraction();
+          }
         }
         return; // STATE LOCK: Ignore orientation trigger changes when running!
       }
